@@ -20,9 +20,12 @@ public class PaymentProcessService {
     private static final Logger logger = LoggerFactory.getLogger(PaymentProcessService.class);
 
     private final TransactionLedgerRepository ledgerRepo;
+    
+    private final  WalletClient walletClient;
 
-    public PaymentProcessService(TransactionLedgerRepository ledgerRepo) {
+    public PaymentProcessService(TransactionLedgerRepository ledgerRepo, WalletClient walletClient) {
         this.ledgerRepo = ledgerRepo;
+        this.walletClient = walletClient;
     }
 
     /**
@@ -44,6 +47,13 @@ public class PaymentProcessService {
             double total = request.getItems().stream()
                     .mapToDouble(i -> i.getUnitPrice() * i.getQuantity())
                     .sum();
+            Double walletBalance = walletClient.getWalletBalance(request.getUserId());
+            walletBalance -= total; // deduct payment
+            logger.info("Updated wallet balance after payment: {}", walletBalance);
+            
+			if (walletBalance < 0) {
+				throw new IllegalArgumentException("Insufficient wallet balance");
+			}
             
             // Example rule to simulate failure
             if (total <= 0) {
@@ -87,7 +97,7 @@ public class PaymentProcessService {
             response.setTotalAmount(total);
             response.setWalletFee(fee);
             response.setNetCreditedToMerchant(netToMerchant);
-            response.setWalletBalanceAfter(420.02); // simulated
+            response.setWalletBalanceAfter(walletBalance); // simulated
             response.setItems(itemResponses);
             response.setMessage("Payment processed successfully");
 

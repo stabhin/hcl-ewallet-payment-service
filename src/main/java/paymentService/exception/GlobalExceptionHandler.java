@@ -9,26 +9,36 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-	/**
-	 * Handles business rule failures
-	 */
-	@ExceptionHandler(BusinessException.class)
-	public ResponseEntity<ApiErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
 
-		ApiErrorResponse response = new ApiErrorResponse("BUSINESS_ERROR", ex.getMessage(), request.getRequestURI());
 
-		return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
-	}
+    /**
+     * Handles business rule failures
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiErrorResponse> handleBusinessException(
+            BusinessException ex,
+            HttpServletRequest request) {
 
-	/**
-	 * Fallback – catches everything else
-	 */
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ApiErrorResponse> handleInternalServerError(Exception ex, HttpServletRequest request) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                "BUSINESS_ERROR",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
 
-		ApiErrorResponse response = new ApiErrorResponse("INTERNAL_SERVER_ERROR", ex.getMessage(),
-				request.getRequestURI());
+        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex,
+            HttpServletRequest request) {
 
-		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+        ApiErrorResponse response = new ApiErrorResponse(
+                "INVALID_ARGUMENT",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

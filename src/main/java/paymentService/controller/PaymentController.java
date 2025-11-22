@@ -28,6 +28,7 @@ public class PaymentController {
     public ResponseEntity<ProcessPaymentResponse> processPayment(
             @RequestBody ProcessPaymentRequest request) {
     	logger.info("PaymentController - processPayment called with request: {}", request);
+    	
         ProcessPaymentResponse response = service.processPayment(request);
         logger.info("PaymentController - processPayment completed with response: {}", response);
         return ResponseEntity.ok(response);

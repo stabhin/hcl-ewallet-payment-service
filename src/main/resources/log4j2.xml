@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <!-- ========================================================= -->
+    <!--  PROPERTY DEFINITIONS                                     -->
+    <!-- ========================================================= -->
+    <Properties>
+        <Property name="LOG_HOME">logs</Property>
+        <Property name="APP_NAME">payment-service</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %c{36} - %msg%n</Property>
+    </Properties>
+
+    <!-- ========================================================= -->
+    <!--  APPENDERS                                                 -->
+    <!-- ========================================================= -->
+    
+    <!-- Console Appender -->
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- Rolling File Appender -->
+        <RollingFile 
+                name="AppFile" 
+                fileName="${LOG_HOME}/${APP_NAME}.log"
+                filePattern="${LOG_HOME}/archive/${APP_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+
+            <Policies>
+                <!-- Roll every day -->
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <!-- Roll when file hits 10MB -->
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+
+            <!-- Keep 30 days history -->
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+    </Appenders>
+
+    <!-- ========================================================= -->
+    <!--  LOGGERS                                                   -->
+    <!-- ========================================================= -->
+
+    <Loggers>
+
+        <!-- Application logs -->
+        <Logger name="paymentService" level="debug" additivity="false">
+            <AppenderRef ref="AppFile"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+
+        <!-- Spring Framework -->
+        <Logger name="org.springframework" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+
+        <!-- Root logger -->
+        <Root level="info">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="AppFile"/>
+        </Root>
+
+    </Loggers>
+
+</Configuration>
